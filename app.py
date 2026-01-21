@@ -1,58 +1,99 @@
 import streamlit as st
 
-# Australian Context & Logic
+# 1. High-Contrast Theme Configuration
 st.set_page_config(page_title="Reality Lab", page_icon="⚖️")
 
+# Custom CSS for readability and ADHD focus
 st.markdown("""
     <style>
-    .stApp { background-color: #0e1117; color: #ffffff; }
-    .stButton>button { width: 100%; border-radius: 5px; height: 3em; background-color: #2e7d32; color: white; border: none; }
-    .stTextArea>div>div>textarea { background-color: #262730; color: white; }
+    /* Force background to black */
+    .stApp {
+        background-color: #000000;
+    }
+    /* Labels (The questions) - Neon Green and Bold */
+    label p {
+        color: #00FF00 !important;
+        font-size: 1.2rem !important;
+        font-weight: bold !important;
+    }
+    /* Main text and headers - Stark White */
+    h1, h2, h3, p, span, div {
+        color: #FFFFFF !important;
+    }
+    /* Input Boxes - Dark grey background, white text */
+    input, textarea, div[data-baseweb="select"] > div {
+        background-color: #1A1A1A !important;
+        color: #FFFFFF !important;
+        border: 1px solid #00FF00 !important;
+    }
+    /* Buttons - High Contrast Neon */
+    .stButton>button {
+        width: 100%;
+        background-color: #00FF00 !important;
+        color: #000000 !important;
+        font-weight: bold !important;
+        border-radius: 5px;
+        height: 3em;
+        border: none;
+    }
+    /* Sidebar styling */
+    section[data-testid="stSidebar"] {
+        background-color: #111111 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("⚖️ The Reality Lab")
+st.title("⚖️ THE REALITY LAB")
 
-# Logic: Sceptic-Proof CBT
-menu = st.sidebar.radio("Select Tool", ["The 5-Why Drill", "Exposure: Meter Reading", "Avoidance Buster", "Porn/Sabotage Circuit"])
+# Sidebar - Australian Logic
+menu = st.sidebar.radio("CHOOSE TOOL:", ["The 5-Why Drill", "Exposure: Meter Reading", "Avoidance Buster", "Porn/Sabotage Circuit"])
 
 if menu == "The 5-Why Drill":
-    st.header("The 5-Why Drill")
-    belief = st.selectbox("Which core belief is active?", ["I am a failure", "I am worthless", "I am stupid", "I am ugly"])
+    st.header("The 5-Why Evidence Audit")
+    belief = st.selectbox("Current Core Belief:", ["I am a failure", "I am worthless", "I am stupid", "I am ugly"])
     
-    q1 = st.text_input(f"1. Why do you believe you are {belief} right now?")
-    q2 = st.text_input("2. Why does that specifically prove your worthlessness?") if q1 else None
-    q3 = st.text_input("3. Why is that 'evidence' actually a fact and not just a feeling?") if q2 else None
-    q4 = st.text_input("4. Why did you learn to think this way as a child?") if q3 else None
-    q5 = st.text_input("5. At the root, what is the 'So What?' (What happens if this is true?)") if q4 else None
+    st.write("---")
+    w1 = st.text_input(f"1. What is the valid evidence that you are {belief}?")
+    w2 = st.text_input("2. Even if that's true, why does it mean you're a failure (and not just human)?") if w1 else None
+    w3 = st.text_input("3. What is the childhood 'root' of this feeling?") if w2 else None
+    w4 = st.text_input("4. Is this belief helping you work, or just helping you hide?") if w3 else None
+    w5 = st.text_input("5. THE 'SO WHAT?': If you are 'worthless' today, can you still do one useful thing?") if w4 else None
     
-    if q5:
-        st.error("LOGIC CHECK:")
-        st.write("Even if the evidence is 100% true (e.g., your business is struggling), **SO WHAT?**")
-        st.write("Does a struggling business mean you cease to be a functioning human? No. It means you have a problem to solve. Solutions require logic, not shame.")
+    if w5:
+        st.success("LOGIC VERDICT:")
+        st.write("**The Sceptic’s Truth:** Your brain says 'I am a failure' to protect you from trying. It’s a survival mechanism, not a fact.")
+        st.write("**Management:** Accept the feeling of failure. Do the work anyway. The work doesn't care how you feel.")
 
 elif menu == "Exposure: Meter Reading":
     st.header("HF-SET: Social Exposure")
-    st.info("Meter reading is your gym. You are being paid to let people see you while you feel ashamed. This is high-level training.")
-    shame = st.slider("Shame Level (0-10)", 0, 10, 5)
-    houses = st.number_input("Houses Visited", 0, 500, step=1)
+    st.write("Current Job: Meter Reading.")
+    st.write("**Reframing:** You aren't a 'meter reader.' You are a 'Social Exposure Athlete.' Each house is a rep.")
     
-    if st.button("Log Training Session"):
-        st.success(f"Logged. You just did {houses} reps of social anxiety exposure. Your brain is rewiring even if you don't feel it yet.")
+    shame = st.slider("Shame Intensity (0-10)", 0, 10, 5)
+    houses = st.number_input("Number of Gates Opened", 0, 500, step=1)
+    
+    if st.button("Log Training Reps"):
+        st.info(f"You faced {houses} potential judgements. You are still alive. The 'Worthless' narrative is losing its power through action.")
 
 elif menu == "Avoidance Buster":
     st.header("The Avoidance Buster")
-    task = st.text_input("What are you avoiding right now?")
+    task = st.text_input("What are you avoiding? (Work, church, business calls?)")
+    
     if task:
-        st.write(f"**The Sceptic's Truth:** You are avoiding '{task}' because you are afraid of the 'Failure' label. But by avoiding it, you are **guaranteeing** the failure you fear.")
-        if st.button("Commit to 5 Minutes"):
-            st.warning("Action creates dopamine. Motivation is a myth. Start the timer.")
+        st.write("### THE SO-WHAT CHALLENGE:")
+        st.write(f"1. If you do '{task}' and fail, you are exactly where you are now.")
+        st.write(f"2. If you avoid it, you are GUARANTEEING failure.")
+        st.write("**Logic:** The only way to lose is to avoid.")
+        if st.button("Start 5-Minute Timer"):
+            st.warning("Go. Do 5 minutes of it now. Stop thinking.")
 
 elif menu == "Porn/Sabotage Circuit":
     st.header("Circuit Breaker")
-    st.write("You want to use porn or isolate because your brain is seeking a 'safe' dopamine hit to hide from shame.")
+    st.error("DANGER: SABOTAGE MODE DETECTED")
+    st.write("You are likely triggered by a feeling of worthlessness. You want the AI generation to numb the pain.")
+    
     if st.button("I am about to sabotage"):
-        st.error("STOP.")
-        st.write("1. You are not 'evil.' You are under-stimulated and over-stressed (ADHD).")
-        st.write("2. This hit will last 10 minutes. The shame will last 3 days.")
-        st.write("3. **The Counter-Move:** Go into a different room. Call one person. Do not explain why, just say hello.")
+        st.write("### READ THIS SLOWLY:")
+        st.write("1. This is a dopamine hack for an ADHD brain. It’s not a moral fail, it’s a bad strategy.")
+        st.write("2. In 30 minutes, you will feel 10x more 'ugly' and 'worthless' than you do now.")
+        st.write("3. **ACTION:** Put the phone in another room. Drink a glass of water. Walk outside for 2 minutes.")
