@@ -1,32 +1,19 @@
 import streamlit as st
 
 # 1. High-Contrast Theme Configuration
-st.set_page_config(page_title="Reality Lab", page_icon="⚖️")
+st.set_page_config(page_title="The Truth Lab", page_icon="⚖️")
 
 # Custom CSS for readability and ADHD focus
 st.markdown("""
     <style>
-    /* Force background to black */
-    .stApp {
-        background-color: #000000;
-    }
-    /* Labels (The questions) - Neon Green and Bold */
-    label p {
-        color: #00FF00 !important;
-        font-size: 1.2rem !important;
-        font-weight: bold !important;
-    }
-    /* Main text and headers - Stark White */
-    h1, h2, h3, p, span, div {
-        color: #FFFFFF !important;
-    }
-    /* Input Boxes - Dark grey background, white text */
+    .stApp { background-color: #000000; }
+    label p { color: #00FF00 !important; font-size: 1.2rem !important; font-weight: bold !important; }
+    h1, h2, h3, p, span, div { color: #FFFFFF !important; }
     input, textarea, div[data-baseweb="select"] > div {
         background-color: #1A1A1A !important;
         color: #FFFFFF !important;
         border: 1px solid #00FF00 !important;
     }
-    /* Buttons - High Contrast Neon */
     .stButton>button {
         width: 100%;
         background-color: #00FF00 !important;
@@ -36,64 +23,101 @@ st.markdown("""
         height: 3em;
         border: none;
     }
-    /* Sidebar styling */
-    section[data-testid="stSidebar"] {
-        background-color: #111111 !important;
-    }
+    .stAlert { background-color: #1A1A1A !important; border: 1px solid #00FF00 !important; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("⚖️ THE REALITY LAB")
+# --- APP LOGIC & STATE ---
+if 'step' not in st.session_state:
+    st.session_state.step = 1
 
-# Sidebar - Australian Logic
-menu = st.sidebar.radio("CHOOSE TOOL:", ["The 5-Why Drill", "Exposure: Meter Reading", "Avoidance Buster", "Porn/Sabotage Circuit"])
+unhelpful_thoughts = [
+    "I can't get a job", "I can't express myself", "People think I am a fool",
+    "I am useless", "I am hopeless", "I am horrible", "I am a failure",
+    "I am ugly", "I am stupid", "I am a disappointment", "I am worthless",
+    "I am ridiculous", "People are judging me", "My kids hate me",
+    "I am heartless", "I will always fail", "I am irritating"
+]
 
-if menu == "The 5-Why Drill":
-    st.header("The 5-Why Evidence Audit")
-    belief = st.selectbox("Current Core Belief:", ["I am a failure", "I am worthless", "I am stupid", "I am ugly"])
-    
-    st.write("---")
-    w1 = st.text_input(f"1. What is the valid evidence that you are {belief}?")
-    w2 = st.text_input("2. Even if that's true, why does it mean you're a failure (and not just human)?") if w1 else None
-    w3 = st.text_input("3. What is the childhood 'root' of this feeling?") if w2 else None
-    w4 = st.text_input("4. Is this belief helping you work, or just helping you hide?") if w3 else None
-    w5 = st.text_input("5. THE 'SO WHAT?': If you are 'worthless' today, can you still do one useful thing?") if w4 else None
-    
-    if w5:
-        st.success("LOGIC VERDICT:")
-        st.write("**The Sceptic’s Truth:** Your brain says 'I am a failure' to protect you from trying. It’s a survival mechanism, not a fact.")
-        st.write("**Management:** Accept the feeling of failure. Do the work anyway. The work doesn't care how you feel.")
+# --- SIDEBAR NAVIGATION ---
+st.sidebar.title("🎛️ CONTROL PANEL")
+menu = st.sidebar.radio("CHOOSE TOOL:", ["The Truth Drill", "Avoidance Buster (Exposure)", "My Adult Evidence"])
 
-elif menu == "Exposure: Meter Reading":
-    st.header("HF-SET: Social Exposure")
-    st.write("Current Job: Meter Reading.")
-    st.write("**Reframing:** You aren't a 'meter reader.' You are a 'Social Exposure Athlete.' Each house is a rep.")
+# --- TOOL 1: THE TRUTH DRILL ---
+if menu == "The Truth Drill":
+    st.title("⚖️ THE TRUTH DRILL")
     
-    shame = st.slider("Shame Intensity (0-10)", 0, 10, 5)
-    houses = st.number_input("Number of Gates Opened", 0, 500, step=1)
-    
-    if st.button("Log Training Reps"):
-        st.info(f"You faced {houses} potential judgements. You are still alive. The 'Worthless' narrative is losing its power through action.")
+    if st.session_state.step == 1:
+        thought = st.selectbox("What is the surface thought?", unhelpful_thoughts)
+        feeling = st.text_input("What is the feeling? (Shame, Fear, etc.)")
+        belief = st.text_input("What does your brain claim this says about you?")
+        
+        if st.button("Drill Down →"):
+            st.session_state.thought = thought
+            st.session_state.belief = belief
+            st.session_state.step = 2
+            st.rerun()
 
-elif menu == "Avoidance Buster":
-    st.header("The Avoidance Buster")
-    task = st.text_input("What are you avoiding? (Work, church, business calls?)")
+    elif st.session_state.step == 2:
+        st.write(f"**Target Belief:** {st.session_state.belief}")
+        w1 = st.text_input("Why does that matter?")
+        w2 = st.text_input("And why does THAT matter?")
+        w3 = st.text_input("What is the childhood root of this?")
+
+        if st.button("Pivot to Reality →"):
+            st.session_state.w3 = w3
+            st.session_state.step = 3
+            st.rerun()
+
+    elif st.session_state.step == 3:
+        st.error("### THE CHILDHOOD SCRIPT")
+        st.write(f"Because of those insecure and cruel comments, your brain is lying to you. It says you are '{st.session_state.belief}' because of '{st.session_state.w3}'.")
+        
+        st.success("### THE ADULT REALITY")
+        st.markdown(f"""
+        **In spite of that upbringing, the evidence shows:**
+        * You have a family who loves you.
+        * You earned qualifications despite your education history.
+        * You have friends who care about you.
+        * **The thought '{st.session_state.thought}' is a survival reflex, not a fact.**
+        """)
+        if st.button("Reset Drill"):
+            st.session_state.step = 1
+            st.rerun()
+
+# --- TOOL 2: AVOIDANCE BUSTER (EXPOSURE) ---
+elif menu == "Avoidance Buster (Exposure)":
+    st.title("🛡️ AVOIDANCE BUSTER")
+    task = st.text_input("What task are you avoiding right now?")
     
     if task:
-        st.write("### THE SO-WHAT CHALLENGE:")
-        st.write(f"1. If you do '{task}' and fail, you are exactly where you are now.")
-        st.write(f"2. If you avoid it, you are GUARANTEEING failure.")
-        st.write("**Logic:** The only way to lose is to avoid.")
-        if st.button("Start 5-Minute Timer"):
-            st.warning("Go. Do 5 minutes of it now. Stop thinking.")
+        st.subheader("The Logic of the Gap")
+        st.write("Your brain says avoiding this keeps you 'safe.' Let's look at the math:")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**AVOIDING IT:**")
+            st.write("❌ 100% Chance of failure.")
+            st.write("❌ Childhood voices get stronger.")
+            st.write("❌ Anxiety increases for tomorrow.")
+        
+        with col2:
+            st.markdown("**DOING IT (Even Badly):**")
+            st.write("✅ 50% Chance of success.")
+            st.write("✅ You prove you are NOT 'useless'.")
+            st.write("✅ The 'oily nose' fear loses power.")
 
-elif menu == "Porn/Sabotage Circuit":
-    st.header("Circuit Breaker")
-    st.error("DANGER: SABOTAGE MODE DETECTED")
-    st.write("You are likely triggered by a feeling of worthlessness. You want the AI generation to numb the pain.")
+        st.info(f"**ACTION:** Do 5 minutes of '{task}' now. The goal is not to do it perfectly; the goal is to **disobey the fear.**")
+        
+        if st.button("I am doing it now (Log Rep)"):
+            st.balloons()
+            st.success("Rep logged. You are an exposure athlete.")
+
+# --- TOOL 3: EVIDENCE LOG ---
+elif menu == "My Adult Evidence":
+    st.title("📖 THE EVIDENCE LOG")
+    st.write("Record your adult wins here to use during the Truth Drills.")
     
-    if st.button("I am about to sabotage"):
-        st.write("### READ THIS SLOWLY:")
-        st.write("1. This is a dopamine hack for an ADHD brain. It’s not a moral fail, it’s a bad strategy.")
-        st.write("2. In 30 minutes, you will feel 10x more 'ugly' and 'worthless' than you do now.")
-        st.write("3. **ACTION:** Put the phone in another room. Drink a glass of water. Walk outside for 2 minutes.")
+    new_evidence = st.text_area("Add a new piece of evidence (e.g., 'I got my cert today', 'I had a laugh with my kids'):")
+    if st.button("Save to Memory"):
+        st.toast("Evidence saved for your next drill!")
