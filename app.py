@@ -27,8 +27,10 @@ if 'step' not in st.session_state:
     st.session_state.step = 1
 if 'evidence_logs' not in st.session_state:
     st.session_state.evidence_logs = ["I have a family.", "I earned qualifications.", "I have friends who care."]
-if 'goals' not in st.session_state:
-    st.session_state.goals = []
+if 'goal_history' not in st.session_state:
+    st.session_state.goal_history = []
+if 'meditation_reps' not in st.session_state:
+    st.session_state.meditation_reps = 0
 
 unhelpful_thoughts = [
     "I can't get a job", "I can't express myself", "People think I am a fool", "I am useless", 
@@ -40,7 +42,7 @@ unhelpful_thoughts = [
 ]
 
 # --- NAVIGATION ---
-menu = st.sidebar.radio("CHOOSE TOOL:", ["The Truth Drill", "Setback Recovery", "The Standard Shifter", "Evidence & Goals"])
+menu = st.sidebar.radio("CHOOSE TOOL:", ["The Truth Drill", "Setback Recovery", "Meditation Lab", "The Standard Shifter", "Evidence & Goals", "Goal History"])
 
 if st.sidebar.button("🚨 PANIC: I'M SPIRALING"):
     st.session_state.step = "panic"
@@ -48,7 +50,6 @@ if st.sidebar.button("🚨 PANIC: I'M SPIRALING"):
 # --- TOOL 1: THE TRUTH DRILL ---
 if menu == "The Truth Drill" and st.session_state.step != "panic":
     st.title("⚖️ THE TRUTH DRILL")
-    
     if st.session_state.step == 1:
         thought = st.selectbox("What is the surface thought?", ["Select a thought..."] + unhelpful_thoughts)
         belief = st.text_input("What does your brain claim this says about you?")
@@ -56,93 +57,97 @@ if menu == "The Truth Drill" and st.session_state.step != "panic":
             st.session_state.thought, st.session_state.belief = thought, belief
             st.session_state.step = 2
             st.rerun()
-
     elif st.session_state.step == 2:
-        st.subheader("Challenging the Identity")
-        q1 = st.text_area(f"1. Describe what '{st.session_state.belief}' means like you were telling a friend.")
+        st.subheader("Contextual Reality Check")
+        q1 = st.text_area(f"1. Describe what '{st.session_state.belief}' looks like considering the ups and downs of life.")
         q2 = st.text_input(f"2. By whose definition are you '{st.session_state.belief}'?")
-        q3 = st.text_input("3. Considering your upbringing, describe the SITUATION (not you) without bias:")
+        q3 = st.text_area("3. Neutral Observation: Describe the situation without the cruel labels.")
         if st.button("The Final Verdict →"):
-            st.session_state.bias_free = q3
+            st.session_state.neutral_view = q3
             st.session_state.step = 3
             st.rerun()
-
     elif st.session_state.step == 3:
         st.error("### THE PARENTAL SCRIPT")
-        st.write(f"The belief '{st.session_state.belief}' is a legacy standard from your upbringing. It is not an adult fact.")
+        st.write(f"The label '{st.session_state.belief}' is a legacy filter, not an adult fact.")
         st.success("### THE ADULT REALITY")
-        st.write(f"**Objective Situation:** {st.session_state.bias_free}")
-        st.write("**The Adult Truths:**")
+        st.info(f"**Neutral Observation:** {st.session_state.neutral_view}")
         for item in st.session_state.evidence_logs:
             st.write(f"✅ {item}")
         if st.button("Reset Drill"):
             st.session_state.step = 1
             st.rerun()
 
-# --- TOOL 2: SETBACK RECOVERY (SO WHAT?) ---
+# --- TOOL 2: SETBACK RECOVERY ---
 elif menu == "Setback Recovery":
     st.title("🔄 SETBACK RECOVERY")
     event = st.text_input("What went wrong?")
     if event:
-        st.write("### THE 'SO WHAT?' DRILL")
-        s1 = st.text_input(f"If it's true that {event}, so what? What does that mean?")
-        s2 = st.text_input("And if that happens, so what?")
-        s3 = st.selectbox("Which core belief is this trying to trigger?", unhelpful_thoughts)
-        
+        s1 = st.text_input(f"If it's true that '{event}', so what? What is the worst-case result?")
+        s2 = st.text_input("Why does your brain say this means you are fundamentally broken?")
+        s3 = st.selectbox("Which core belief is this triggering?", unhelpful_thoughts)
         if s1 and s2 and s3:
-            st.warning(f"**REALITY CHECK:** Your brain is using a mistake to prove you are '{s3}'.")
-            st.info(f"Considering your childhood, is it possible you are just a human making a mistake, and the 'Failure' label is just an old voice?")
-            if st.button("Is that really you?"):
-                st.write("### NO. IT IS NOT.")
-                st.write("You are a 54-year-old adult who survived. This setback is data, not a death sentence.")
+            st.warning(f"**IS THAT REALLY YOU?** Your brain is using a human mistake to fuel the '{s3}' script.")
+            st.write("This mistake is just data. It doesn't overwrite your qualifications or your family.")
 
-# --- TOOL 3: THE STANDARD SHIFTER ---
+# --- TOOL 3: MEDITATION LAB ---
+elif menu == "Meditation Lab":
+    st.title("🧘 MEDITATION LAB")
+    st.write("Ground yourself in your 54-year-old body. It is 2026. You are safe.")
+    
+    duration = st.slider("Set session length (minutes):", 1, 20, 5)
+    
+    if st.button("Start Meditation"):
+        st.info("Close your eyes. Breathe in for 4, hold for 4, out for 4. Watch the old scripts pass like clouds.")
+        placeholder = st.empty()
+        for t in range(duration * 60, 0, -1):
+            m, s = divmod(t, 60)
+            placeholder.metric("Present Moment Remaining:", f"{m:02d}:{s:02d}")
+            time.sleep(1)
+        st.success("Session complete. You successfully stayed in the present.")
+        st.session_state.meditation_reps += 1
+        st.session_state.evidence_logs.append(f"Completed {duration}m meditation session.")
+
+# --- TOOL 4: THE STANDARD SHIFTER ---
 elif menu == "The Standard Shifter":
     st.title("📏 THE STANDARD SHIFTER")
-    st.write("Let's separate their rules from yours.")
-    
     col1, col2 = st.columns(2)
     with col1:
         st.header("Legacy Standard")
-        st.write("(What they told you)")
-        st.write("1. Success is perfect.")
-        st.write("2. Mistakes are shameful.")
-        st.write("3. Worth is based on work.")
-    
+        st.write("❌ Worth = Paycheck")
+        st.write("❌ Errors = Shame")
     with col2:
         st.header("My Adult Standard")
-        st.write("(What YOU decide now)")
-        goal = st.text_input("By MY definition, a 'good day' is:")
-        worth = st.text_input("By MY definition, my worth is based on:")
-    
-    if st.button("Adopt My Standards"):
-        st.success("New standards saved. You are the judge now.")
+        new_provide = st.text_input("I define 'Providing' as:")
+        new_success = st.text_input("I define 'Success' as:")
+    if st.button("Update Standards"):
+        st.success("You are now the judge.")
 
-# --- TOOL 4: EVIDENCE & GOALS ---
+# --- TOOL 5: EVIDENCE & GOALS ---
 elif menu == "Evidence & Goals":
     st.title("📖 REALITY & FUTURE")
-    st.header("1. Evidence Log")
     new_win = st.text_input("Record an adult win:")
     if st.button("Save Win") and new_win:
         st.session_state.evidence_logs.append(new_win)
-        st.toast("Evidence Recorded.")
-    
     st.write("---")
-    st.header("2. Tomorrow's Goals (Min 3)")
-    g1 = st.text_input("Goal 1:")
-    g2 = st.text_input("Goal 2:")
-    g3 = st.text_input("Goal 3:")
+    st.header("Tomorrow's Goals (Min 3)")
+    g1, g2, g3 = st.text_input("Goal 1:"), st.text_input("Goal 2:"), st.text_input("Goal 3:")
     if st.button("Lock in Goals"):
         if g1 and g2 and g3:
-            st.session_state.goals = [g1, g2, g3]
+            st.session_state.goal_history.append({"date": time.strftime("%Y-%m-%d"), "goals": [g1, g2, g3]})
             st.success("Goals locked.")
-        else:
-            st.error("Please enter at least 3 goals.")
+
+# --- TOOL 6: GOAL HISTORY ---
+elif menu == "Goal History":
+    st.title("📈 GOAL HISTORY")
+    st.write(f"Total Mindfulness Sessions: {st.session_state.meditation_reps}")
+    for entry in reversed(st.session_state.goal_history):
+        with st.expander(f"Goals for {entry['date']}"):
+            for g in entry['goals']:
+                st.write(f"🎯 {g}")
 
 # --- PANIC MODE ---
 if st.session_state.step == "panic":
     st.title("🚨 REALITY CHECK")
-    st.write("### THE FACTS:")
     for item in st.session_state.evidence_logs:
         st.write(f"✅ {item}")
     if st.button("Resume"):
